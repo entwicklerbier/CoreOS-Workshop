@@ -4,16 +4,31 @@
 Vagrant.require_version ">= 1.6.0"
 
 # Defaults for config options defined in CONFIG
-$num_instances = 1
-$update_channel = "beta"
-$vb_gui = false
-$vb_memory = 1024
-$vb_cpus = 1
+NUM_CPUS = 4
+
+if !ENV['NUM_INSTANCES']
+  p 'You have to set NUM_INSTANCES env'
+  exit
+end
+
+if !ENV['START_IP']
+  p 'You have to set START_IP env'
+  exit
+end
+
+if !ENV['RAM_PER_INSTANCE']
+  p 'You have to set RAM_PER_INSTANCE env'
+  exit
+end
+
+num_instances = ENV['NUM_INSTANCES'].to_i
+start_ip = ENV['START_IP'].to_i
+ram_per_instance = ENV['RAM_PER_INSTANCE'].to_i
 
 # Use discovery URL
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "coreos-%s" % $update_channel
+  config.vm.box = "coreos-beta"
   config.vm.box_url = "http://coreos.ws.tld/coreos_production_vagrant.json"
 
   # plugin conflict
@@ -21,37 +36,25 @@ Vagrant.configure("2") do |config|
     config.vbguest.auto_update = false
   end
 
-  (1..$num_instances).each do |i|
+  (1..num_instances).each do |i|
     vm_name = "core-%02d" % i
     config.vm.define(vm_name) do |config|
       config.vm.hostname = vm_name
 
-      if $expose_docker_tcp
-        config.vm.network "forwarded_port", guest: 2375, host: ($expose_docker_tcp + i - 1), auto_correct: true
+      config.vm.provider "virtualbox" do |v|
+        v.memory = ram_per_instance
+        v.cpus = NUM_CPUS
       end
 
-      config.vm.provider :kvm do |vb|
-        vb.gui = $vb_gui
-        vb.memory = $vb_memory
-        vb.cpus = $vb_cpus
+      config.vm.provider "kvm" do |v|
+        v.memory = ram_per_instance
+        v.cpus = NUM_CPUS
       end
 
-      config.vm.provider :virtualbox do |vb|
-        vb.gui = $vb_gui
-        vb.memory = $vb_memory
-        vb.cpus = $vb_cpus
-      end
+      ip = "10.0.0.#{i+start_ip}"
+      config.vm.network  "public_network", ip: ip, bridge: 'en0: Ethernet'
 
-      ip = "172.17.8.#{i+100}"
-      config.vm.network :private_network, ip: ip
-
-      # Uncomment below to enable NFS for sharing the host machine into the coreos-vagrant VM.
-      config.vm.synced_folder ".", "/home/core/share", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']
-
-      if File.exist?(CLOUD_CONFIG_PATH)
-        config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
-        config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
-      end
+      p "CoreOS Machine with IP: #{ip}"
 
     end
   end
