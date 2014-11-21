@@ -27,6 +27,6 @@ coreos:
                 Name=eno1
 
                 [Network]
-                Address={ip_address}/24
+                Address=$public_ipv4/24
                 Gateway=10.0.0.138
                 DNS=10.0.0.101
