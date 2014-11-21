@@ -1,4 +1,4 @@
-# cloud-config
+#cloud-config
 
 ssh_authorized_keys:
     - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAsFkEJguuTMET3vh4ZhhvHkSGlxRVyfnPdNzuc6SQ/sEM6/GXfX9j5Sugb009pBmJgB6z3WE1g8vCzdCgAdhMv6GYkAWplOjD0sJeTELY8NiRzrPEJxzouvBwc5p91JgU0QM+a7UPKhkqKvNNKbq2Z3EpqC92xabiRpOJ/ENKrx92uDBSn4+hx2Mh53qIa7o69vIOh1V0wZyL1yBSscuPrxhPmEz1RogfTnRpz8Db2SIZpMg0BEjz5ZW/n++tkB9McZSVgBcZCiMs6EONDKf4mOssUBZ2vPIllhPVaRqdsn7ytqiIoXxedQ1F6zSZmqHm0yTGbkvzxRE2rNr+Y2CavQ== panta@panta.local
@@ -11,20 +11,22 @@ coreos:
     etcd:
         discovery: https://discovery.etcd.io/5398b95c014a82591e5edc2d770efce9
         addr: $public_ipv4:4001
+        # bind-addr: 0.0.0.0:4001
         peer-addr: $public_ipv4:7001
-    fleet:
-        public-ip: $public_ipv4
     units:
-        - name: etcd.service
+        -
+            name: etcd.service
             command: start
-        - name: fleet.service
+        -
+            name: fleet.service
             command: start
-        - name: static.network
+        -
+            name: static.network
             content: |
                 [Match]
                 Name=eno1
 
                 [Network]
-                Address=$public_ipv4/24
+                Address={ip_address}/24
                 Gateway=10.0.0.138
                 DNS=10.0.0.101
