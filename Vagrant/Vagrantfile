@@ -29,6 +29,8 @@ if ENV['RAM_PER_INSTANCE'] && ENV['RAM_PER_INSTANCE'].to_i
   ram_per_instance = ENV['RAM_PER_INSTANCE'].to_i
 end
 
+start_ip = ENV['START_IP'].to_i
+
 # Use discovery URL
 
 Vagrant.configure("2") do |config|
