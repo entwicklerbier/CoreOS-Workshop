@@ -62,7 +62,7 @@ coreos:
 EOF
 
 sed -i 's#BASE_URL=.*#BASE_URL="http://coreos.ws.tld"#' coreos-install
-./coreos-install -d /dev/sda -C beta -c user_data
+./coreos-install -d /dev/thesuperdevice -C beta -c user_data
 """
 
 print(cloud_config_template.format(
