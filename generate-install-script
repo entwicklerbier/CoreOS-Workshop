@@ -17,7 +17,7 @@ wget 'https://raw.github.com/coreos/init/master/bin/coreos-install'
 chmod +x coreos-install
 
 cat > user_data <<EOF
-# cloud-config
+#cloud-config
 
 hostname: {hostname}
 
@@ -36,11 +36,14 @@ coreos:
         # bind-addr: 0.0.0.0:4001
         peer-addr: {ip_address}:7001
     units:
-        - name: etcd.service
+        -
+            name: etcd.service
             command: start
-        - name: fleet.service
+        -
+            name: fleet.service
             command: start
-        - name: static.network
+        -
+            name: static.network
             content: |
                 [Match]
                 Name=eno1
@@ -50,15 +53,16 @@ coreos:
                 Gateway=10.0.0.138
                 DNS=10.0.0.101
 
-users:
-    - name: rut
-        passwd: $1$1gdN/ddX$RDKgNiMC1NnHfQ.nLCk5P1
-        groups:
-            - sudo
+# users:
+#     -
+#         name: rut
+#         passwd: "$1$1gdN/ddX$RDKgNiMC1NnHfQ.nLCk5P1"
+#         groups:
+#             - sudo
 EOF
 
 sed -i 's#BASE_URL=.*#BASE_URL="http://coreos.ws.tld"#' coreos-install
-./coreos-install -d /dev/sda -C beta -c user_data
+./coreos-install -d /dev/thesuperdevice -C beta -c user_data
 """
 
 print(cloud_config_template.format(
