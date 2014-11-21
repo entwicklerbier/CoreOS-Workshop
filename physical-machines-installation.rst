@@ -28,5 +28,6 @@ Vagrant + KVM
 
 	vagrant plugin install vagrant-kvm
 
-	cd Vagrant
-	NUM_INSTANCES=1 START_IP=200 RAM_PER_INSTANCE=1024 vagrant up
+
+cd Vagrant
+NUM_INSTANCES=1 START_IP=210 RAM_PER_INSTANCE=1024 vagrant up
