@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+# ./generate-install-script https://discovery.etcd.io/7465d59de68ca017509f183ecd8f92de gt01 10.0.0.201 | ssh hosting "cat > www/panta.gerade.org/gt01"
+# ./generate-install-script https://discovery.etcd.io/7465d59de68ca017509f183ecd8f92de gt02 10.0.0.202 | ssh hosting "cat > www/panta.gerade.org/gt02"
+# ./generate-install-script https://discovery.etcd.io/7465d59de68ca017509f183ecd8f92de gt03 10.0.0.203 | ssh hosting "cat > www/panta.gerade.org/gt03"
+
+import sys
+
+if len(sys.argv) < 4:
+    print('usage: {} discovery_url hostname ip_address'.format(
+        sys.argv[0]), file=sys.stderr)
+    sys.exit(1)
+
+cloud_config_template = """#!/bin/bash
+
+wget 'https://raw.github.com/coreos/init/master/bin/coreos-install'
+chmod +x coreos-install
+
+cat > user_data <<EOF
+# cloud-config
+
+hostname: {hostname}
+
+ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAsFkEJguuTMET3vh4ZhhvHkSGlxRVyfnPdNzuc6SQ/sEM6/GXfX9j5Sugb009pBmJgB6z3WE1g8vCzdCgAdhMv6GYkAWplOjD0sJeTELY8NiRzrPEJxzouvBwc5p91JgU0QM+a7UPKhkqKvNNKbq2Z3EpqC92xabiRpOJ/ENKrx92uDBSn4+hx2Mh53qIa7o69vIOh1V0wZyL1yBSscuPrxhPmEz1RogfTnRpz8Db2SIZpMg0BEjz5ZW/n++tkB9McZSVgBcZCiMs6EONDKf4mOssUBZ2vPIllhPVaRqdsn7ytqiIoXxedQ1F6zSZmqHm0yTGbkvzxRE2rNr+Y2CavQ== panta@panta.local
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFcF+OL37GQT2ZJ8VPO2OINsmdc7YUut8j6DxSbmbgErqrjVbHkVKkDdf8RXX0aOOe4yKnBV4/2wv2HFYo/XSyp3T4DAeSxsGF30RmpxxFH8RTRKuPDgZySCpnKjdFYt8yiIPLZJsD3xMSrAFyf7IE1pdC65xYcD+IO90lakKMyHivO7+uwGJaCwvsjUP25avyTuxasI/g+3Rm5WVt7SfmkHnqfChg2XoFi1UgvUwbqv2T5Oq6d4IuGhW5jtqkNsJ0ezc2hdrBhYjLkUOoY4tdc0gvLKBAn7AuhvDVCqgIVlYqTw+cVcvoe6yIroRJmpG7lLuEe5RkB1t3uesIGk5f svenwiesner@localhost
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGWi8y12ZRtgZQXvHZwFYaaS1z0WxvA72pO4oZnBoC9sC+cqHUr/zLMRIooY6pDSbXireDzqEXINxcjWSEnaoMLv61VqTcaqFlwDFeErtnYzkkWpHlTLoHzZWKu8wyuhPJP97NGrSdiz6hLBUQDkCZir0dEFPMxHVTXXC1YQqswTGvEc78whPQK9+4W7YrnyCer++ucc3IofXCqrldpARH3dD5cQIMvpucfRm3U1EqxvlZbjZGC1pySR3wqTab7p31MX18+2+TLCLR3TrWrQ+KgJS45lpQCRTzZrdhKWd6h2HZQV85PdGAqmNzg9eSREhiguHcZJ4ETI/WQEyPLEYR skarufue@smallmobilebox
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLlUWmVeM8nBaRxsRkBGJxcGrvo3uf8lkSQV4/XYSV5kPnmm6JY9E3B9Kyq9lgFXQWtp7QQCS8RZpxCwrqDuWXBlM4sQlvnI6tKz1RTGZH0CcEFo0dnbrUjcG7LZWfa6JduFz/mlF14Y2WYcVYsLZzBiR6K83E83738kC0WGxfzYJZDWSyRB9RXxOJMb2P/U4P4Atu8rwkzIDaM3YZ+L3/rawR/iIy66PWQsW4p5XqF7QkNolTn4/qahAcN3AOH9rm74CGAblp9zW0K4hKuQUiNRcJ8s2R0WLpFWn7uJ3MXn4OlvRqSC7ELyotlEWqJY8pi5RjDpxgpARn/AeTyq2B mklepp@House-of-Pain.local
+    - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAABAEA3Fa+0fnbTReVmwoKK1aFyZcz0jUuxPXXTRj46e7pY3IvBmsw9I25sSz9G7YFGdwTtlfiS42rHHxOXBVEzi73JaVQh6A7EHfriRQ7yJr+gEEkSKF7YuDWrdl3gzreYXWX6l7lzi0Bt4uOOyTrUocsHtE1K+ruCNmvWw7izy6TmtPU7RAQ1fN3+KF9oYsjvd2cuUbeeMAOw7UHSdnPiZfTL+TSRTAeGJkCiBmX6jcyJS8GVj6Ru8OSuzHY5zKBqDIfV6QBg89Pl+HBj4BsZy+wzEi7gOrGk64esKKIDhAM6Km38SsgCONM3dUKa2wGkhNjO5gQ8O1z1VyqANY12ooZMfILiF6KUcmJO2A2gsmCfBJU26Vfy03epffxF+nWJU/wMFxs+gM7x1igWsDj0FDFaHJ3iT7njUqWC/ycDGvXveUKZj5I/2aFcFZHcjqimHMDw8dMzhiWlKOk1vz09kqUm5ZPgK7XiFpco4ITt2Uw3HBWCsfHav1XmoopAeGIWzGrQQFDhLuOD9eg4hiCqCHF7MpRtrfRjySvV8G/C0qPIT47VTo+tlYnzosCAu2EhxNEnHzGoC8y/sDL+Fie+IT5cx/rjtNF8eXUNvQBNbh6XDZErDacd1vA0vlglDDljZi71QoZQ6DOELPPJ69Wq9phnQ4ExJdIBEwVujNR35DusMWWboNnri6hgmWuo2f8gpOSBwlIyXDrdJ+i5vqFdy1PUffzTf8EAbjimXCKlrbXl8FlZhCkxHhuXwvccQPDZ91DaXgR9WUtuiC8Wb+SxxZWtWuxsEoMIsmWbujGuFGCc65hU3jWg6AcBtEfBN+9Myf3wRQTgsjsnWRif9zB+9bTNzoqQ9DpXhfMAYOJZJWMVsv/s0y5futgBbM/PUHGfc0UEheBtgdtEiE6w6Ul0WhBle6Pyc+0uoGCr+BhvvkuNvjHOWHIuEQvwc2VDtxVjEZflgVMQy0bznDWo705g/lI6crLqQOR46PHJEgdg+xJxd6/+Caz9a38sLFzcXRPppi2HlHuHzjmMDR8gGXlOQh0vROucBEoJEV3UD++T73QaQY9EYFQ6rRZW+URSSVlDMx/rli51OQfS1MHxHGXOAVodeTqAg0RLRRMOkTzWeklggmjYjw0WzJoAjjhvq8eKjLfdSM8WGjs4GW4K811m6GYiiUO80miU93fJe3OUSXsa0uk3cRuA7Zdyj3uQGDOIuvhzRNLILNY01Dgzu/oXw9ixzVK2oBKqzTNVtLx09dmTgdybx5SOFe6KH8rWL7hTL41D4kx++j3yg+/VDRhl0jSs2iOw3WNYGvGGeecmj+OvEt1AXhKk22ONPKXtZ+5B2seynw== zomg@grml
+
+coreos:
+    etcd:
+        name: {hostname}
+        discovery: {discovery_url}
+        addr: {ip_address}:4001
+        # bind-addr: 0.0.0.0:4001
+        peer-addr: {ip_address}:7001
+    units:
+        - name: etcd.service
+            command: start
+        - name: fleet.service
+            command: start
+        - name: static.network
+            content: |
+                [Match]
+                Name=eno1
+
+                [Network]
+                Address={ip_address}/24
+                Gateway=10.0.0.138
+                DNS=10.0.0.101
+
+users:
+    - name: rut
+        passwd: $1$1gdN/ddX$RDKgNiMC1NnHfQ.nLCk5P1
+        groups:
+            - sudo
+EOF
+
+sed -i 's#BASE_URL=.*#BASE_URL="http://coreos.ws.tld"#' coreos-install
+./coreos-install -d /dev/sda -C beta -c user_data
+"""
+
+print(cloud_config_template.format(
+    discovery_url=sys.argv[1],
+    hostname=sys.argv[2],
+    ip_address=sys.argv[3]
+))
