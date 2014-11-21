@@ -3,6 +3,10 @@
 
 Vagrant.require_version ">= 1.6.0"
 
+require 'fileutils'
+
+CLOUD_CONFIG_PATH = File.join(File.dirname(__FILE__), "cloud-config")
+
 # Defaults for config options defined in CONFIG
 NUM_CPUS = 4
 
@@ -55,6 +59,11 @@ Vagrant.configure("2") do |config|
       config.vm.network  "public_network", ip: ip, bridge: 'en0: Ethernet'
 
       p "CoreOS Machine with IP: #{ip}"
+
+      if File.exist?(CLOUD_CONFIG_PATH)
+        config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-cloud-config"
+        config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-cloud-config /var/lib/coreos-vagrant/", :privileged => true
+      end
 
     end
   end
