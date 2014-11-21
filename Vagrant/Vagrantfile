@@ -61,8 +61,8 @@ Vagrant.configure("2") do |config|
       p "CoreOS Machine with IP: #{ip}"
 
       if File.exist?(CLOUD_CONFIG_PATH)
-        config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-cloud-config"
-        config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-cloud-config /var/lib/coreos-vagrant/", :privileged => true
+        config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
+        config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/vagrantfile-user-data", :privileged => true
       end
 
     end
