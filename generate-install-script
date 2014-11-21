@@ -53,12 +53,12 @@ coreos:
                 Gateway=10.0.0.138
                 DNS=10.0.0.101
 
-users:
-    -
-        name: rut
-        passwd: "$1$1gdN/ddX$RDKgNiMC1NnHfQ.nLCk5P1"
-        groups:
-            - sudo
+# users:
+#     -
+#         name: rut
+#         passwd: "$1$1gdN/ddX$RDKgNiMC1NnHfQ.nLCk5P1"
+#         groups:
+#             - sudo
 EOF
 
 sed -i 's#BASE_URL=.*#BASE_URL="http://coreos.ws.tld"#' coreos-install
