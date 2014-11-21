@@ -13,7 +13,7 @@ Vagrant + KVM
 	semanage fcontext -a -t virt_image_t "~/.vagrant.d/tmp/storage-pool(/.*)?"
 	semanage fcontext -a -t virt_image_t "~/.vagrant.d/boxes(/.*)?"
 
-	read /etc/polkit-1/localauthority/50-local.d/50-libvirt-remote-access.pkla <<EOF
+	cat > /etc/polkit-1/localauthority/50-local.d/50-libvirt-remote-access.pkla <<EOF
 	[libvirt Management Access]
 	Identity=unix-user:username
 	Action=org.libvirt.unix.manage
@@ -27,6 +27,3 @@ Vagrant + KVM
 	yum -y install gcc make rubygem-rake ruby-devel libvirt-devel libxslt-devel libxml2-devel
 
 	vagrant plugin install vagrant-kvm
-
-
-restorecon -Rv ~/.vagrant.d
