@@ -31,8 +31,6 @@ end
 
 start_ip = ENV['START_IP'].to_i
 
-# Use discovery URL
-
 Vagrant.configure("2") do |config|
   config.vm.box = "coreos-beta"
   config.vm.box_url = "http://coreos.ws.tld/coreos_production_vagrant.json"
@@ -63,8 +61,10 @@ Vagrant.configure("2") do |config|
       p "CoreOS Machine with IP: #{ip}"
 
       if File.exist?(CLOUD_CONFIG_PATH)
-        config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
-        config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/vagrantfile-user-data", :privileged => true
+        config.vm.provision :file, source: "#{CLOUD_CONFIG_PATH}", destination: "/tmp/vagrantfile-user-data"
+        config.vm.provision :shell, inline:
+          "sed -i 's/{{ hostname }}/#{vm_name}/g' /tmp/vagrantfile-user-data \
+          mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/vagrantfile-user-data", privileged: true
       end
 
     end
