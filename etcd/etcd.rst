@@ -1,0 +1,46 @@
+****
+etcd
+****
+
+https://coreos.com/docs/distributed-configuration/etcd-api/#using-key-ttl
+
+Remove Machines
+===============
+* https://coreos.com/docs/distributed-configuration/etcd-api/#remove-machines
+  
+
+Get all keys
+============
+
+etcdctl
+=======
+
+etcdctl ls : list directories
+etcdctl get : get key
+
+statistics
+==========
+
+* https://coreos.com/docs/distributed-configuration/etcd-api/#statistics
+
+curl -L http://127.0.0.1:4001/v2/stats/leader
+
+Read from inside a docker container
+===================================
+
+* https://coreos.com/docs/distributed-configuration/getting-started-with-etcd/#reading-and-writing-from-inside-a-container
+* https://github.com/progrium/registrator
+
+
+etcd with ENV
+=============
+
+* https://github.com/mattn/etcdenv
+* https://github.com/bradhe/env-to-etcd-import
+
+
+
+etcd with TLS
+=============
+* https://github.com/coreos/etcd/blob/master/Documentation/security.md
+
