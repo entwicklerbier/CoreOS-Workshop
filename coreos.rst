@@ -28,3 +28,8 @@ Control groups
 ==============
 Docker also makes use of another technology called cgroups or control groups. A key to running applications in isolation is to have them only use the resources you want. This ensures containers are good multi-tenant citizens on a host. Control groups allow Docker to share available hardware resources to containers and, if required, set up limits and constraints. For example, limiting the memory available to a specific container.
 
+
+etcd
+====
+
+Changing leader all the times...
