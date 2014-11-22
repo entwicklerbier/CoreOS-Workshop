@@ -8,6 +8,13 @@ Every coreos instance is configured with the provided user-data.yml. When runnin
 
 This file is evaluated at boot time.
 
+Config can be in /usr/share/oem/.
+
+
+Variables
+=========
+* https://coreos.com/docs/cluster-management/setup/cloudinit-cloud-config/
+
 
 Namespaces
 ==========
@@ -33,3 +40,4 @@ etcd
 ====
 
 Changing leader all the times...
+etcd treats the name as the identifier for a node.
