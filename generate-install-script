@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# ./generate-install-script https://discovery.etcd.io/7465d59de68ca017509f183ecd8f92de gt01 10.0.0.201 | ssh hosting "cat > www/panta.gerade.org/gt01"
-# ./generate-install-script https://discovery.etcd.io/7465d59de68ca017509f183ecd8f92de gt02 10.0.0.202 | ssh hosting "cat > www/panta.gerade.org/gt02"
-# ./generate-install-script https://discovery.etcd.io/7465d59de68ca017509f183ecd8f92de gt03 10.0.0.203 | ssh hosting "cat > www/panta.gerade.org/gt03"
+# ./generate-install-script https://discovery.etcd.io/654ce469bea8b5d8945eb6f243e8d72a gt01 10.0.0.201 | ssh hosting "cat > www/panta.gerade.org/gt01"
+# ./generate-install-script https://discovery.etcd.io/654ce469bea8b5d8945eb6f243e8d72a gt02 10.0.0.202 | ssh hosting "cat > www/panta.gerade.org/gt02"
+# ./generate-install-script https://discovery.etcd.io/654ce469bea8b5d8945eb6f243e8d72a gt03 10.0.0.203 | ssh hosting "cat > www/panta.gerade.org/gt03"
 
 import sys
 
@@ -33,8 +33,10 @@ coreos:
         name: {hostname}
         discovery: {discovery_url}
         addr: {ip_address}:4001
-        # bind-addr: 0.0.0.0:4001
+        bind-addr: 0.0.0.0:4001
         peer-addr: {ip_address}:7001
+    fleet:
+        public-ip: {ip_address}
     units:
         -
             name: etcd.service
@@ -46,7 +48,7 @@ coreos:
             name: static.network
             content: |
                 [Match]
-                Name=eno1
+                Name=en*
 
                 [Network]
                 Address={ip_address}/24

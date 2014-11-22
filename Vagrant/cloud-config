@@ -9,8 +9,9 @@ ssh_authorized_keys:
 
 coreos:
     etcd:
-        discovery: https://discovery.etcd.io/99510b2986f0d46e356edfd730555e6f
+        discovery: https://discovery.etcd.io/654ce469bea8b5d8945eb6f243e8d72a
         addr: $public_ipv4:4001
+        bind-addr: 0.0.0.0:4001
         peer-addr: $public_ipv4:7001
     fleet:
         public-ip: $public_ipv4
