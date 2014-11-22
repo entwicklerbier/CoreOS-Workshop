@@ -37,6 +37,7 @@ coreos:
         peer-addr: {ip_address}:7001
     fleet:
         public-ip: {ip_address}
+        peer-election-timeout: 1000
     units:
         -
             name: etcd.service
