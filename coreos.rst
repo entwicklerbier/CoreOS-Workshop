@@ -41,3 +41,24 @@ etcd
 
 Changing leader all the times...
 etcd treats the name as the identifier for a node.
+
+
+Remove all data and create new cluster
+--------------------------------------
+
+::
+
+	URL=https://discovery.etcd.io/...
+
+	systemctl stop etcd
+	rm -r /var/lib/etcd/*
+
+	bash <<EOF
+	sed -i 's|discovery: .*|discovery: ${URL}|' /var/lib/coreos-install/user_data
+	sed -i 's|ETCD_DISCOVERY=.*|ETCD_DISCOVERY=${URL}"|' /run/systemd/system/etcd.service.d/20-cloudinit.conf
+	EOF
+
+	systemctl daemon-reload
+	systemctl start etcd
+
+	journalctl -fu etcd
