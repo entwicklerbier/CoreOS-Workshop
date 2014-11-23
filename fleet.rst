@@ -1,3 +1,5 @@
+`Distributed init system using systemd and etcd`
+
 Cluster
 -------
 
@@ -9,19 +11,16 @@ Cluster
 Unit lifecycle
 --------------
 
+https://github.com/coreos/fleet/blob/master/Documentation/states.md#unit-states
+
 ::
 
-    fleetctl submit hello.service
-    fleetctl list-unit-files
-
-    fleetctl start hello.service
-    fleetctl list-units
-
-    fleetctl stop hello.service
-    fleetctl list-units
-
-    fleetctl destroy hello.service
-    fleetctl list-unit-files
+    fleetctl submit
+    fleetctl load
+    fleetctl start
+    fleetctl stop
+    fleetctl unload
+    fleetctl destroy
 
 
 Unit info
@@ -29,9 +28,12 @@ Unit info
 
 ::
 
+    fleetctl list-unit-files
+    fleetctl list-units
     fleetctl status hello.service
     fleetctl ssh hello.service
     fleetctl journal hello.service
 
 The local machine must be authorized to connect with its SSH key to the machine
 running the unit.
+https://github.com/coreos/fleet/blob/master/Documentation/deployment-and-configuration.md#ssh-keys
